@@ -12,6 +12,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let spawner = ObstacleSpawner()
     
     var isThrusting = false
+
+    private var score: Int = 0
+    private var lastUpdateTime: TimeInterval = 0
+    private var elapsedTime: TimeInterval = 0
+    private let scoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
     
     override func didMove(to view: SKView) {
         self.backgroundColor = .black
@@ -26,7 +31,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             addChild(player)
         }
         
+        setupHUD()
         startSpawning()
+    }
+    
+    private func setupHUD() {
+        scoreLabel.text = "0 m"
+        scoreLabel.fontSize = 28
+        scoreLabel.fontColor = .white
+        scoreLabel.horizontalAlignmentMode = .right
+        scoreLabel.position = CGPoint(x: size.width - 20, y: size.height - 50)
+        scoreLabel.zPosition = 100
+        addChild(scoreLabel)
     }
     
     func startSpawning() {
@@ -53,6 +69,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        if lastUpdateTime == 0 {
+            lastUpdateTime = currentTime
+        }
+        let dt = currentTime - lastUpdateTime
+        lastUpdateTime = currentTime
+        
+        elapsedTime += dt
+        score = Int(elapsedTime * TimeInterval(GameConfig.scoreMultiplier))
+        scoreLabel.text = "\(score) m"
+
         if isThrusting {
             player.physicsBody?.applyForce(CGVector(dx: 0, dy: GameConfig.thrustForce))
             
@@ -73,9 +99,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
+        saveHighScoreIfNeeded()
+        
         let transition = SKTransition.doorway(withDuration: 0.8)
         let menu = MenuScene(size: self.size)
         menu.scaleMode = .aspectFill
+        menu.lastScore = score   // passar para o menu
         self.view?.presentScene(menu, transition: transition)
+    }
+    
+    private func saveHighScoreIfNeeded() {
+        let defaults = UserDefaults.standard
+        let currentHigh = defaults.integer(forKey: StorageKeys.highScore)
+        if score > currentHigh {
+            defaults.set(score, forKey: StorageKeys.highScore)
+        }
     }
 }

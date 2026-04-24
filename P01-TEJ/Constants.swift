@@ -14,8 +14,13 @@ struct PhysicsCategory {
 }
 
 struct GameConfig {
-    static let gravity: CGFloat = -7.0 
+    static let gravity: CGFloat = -7.0
     static let thrustForce: CGFloat = 140.0
     static let maxVelocity: CGFloat = 300.0
     static let spawnRate: TimeInterval = 1.5
+    static let scoreMultiplier: CGFloat = 10.0
+}
+
+struct StorageKeys {
+    static let highScore = "astroDrift.highScore"
 }
