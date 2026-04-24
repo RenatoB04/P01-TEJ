@@ -24,3 +24,9 @@ struct GameConfig {
 struct StorageKeys {
     static let highScore = "astroDrift.highScore"
 }
+
+struct NodeNames {
+    static let retryButton = "retryButton"
+    static let menuButton = "menuButton"
+    static let gameOverOverlay = "gameOverOverlay"
+}

@@ -12,11 +12,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let spawner = ObstacleSpawner()
     
     var isThrusting = false
+    var isGameOver = false
 
     private var score: Int = 0
     private var lastUpdateTime: TimeInterval = 0
     private var elapsedTime: TimeInterval = 0
     private let scoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    private weak var gameOverOverlay: GameOverOverlay?
     
     override func didMove(to view: SKView) {
         self.backgroundColor = .black
@@ -42,14 +45,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.horizontalAlignmentMode = .right
         scoreLabel.position = CGPoint(x: size.width - 20, y: size.height - 50)
         scoreLabel.zPosition = 100
-        addChild(scoreLabel)
+        if scoreLabel.parent == nil {
+            addChild(scoreLabel)
+        }
     }
     
     func startSpawning() {
         self.removeAction(forKey: "spawnLoop")
         let wait = SKAction.wait(forDuration: GameConfig.spawnRate)
         let spawn = SKAction.run { [weak self] in
-            guard let self = self else { return }
+            guard let self = self, !self.isGameOver else { return }
             self.spawner.spawn(in: self)
         }
         let sequence = SKAction.sequence([wait, spawn])
@@ -57,7 +62,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        isThrusting = true
+        if isGameOver {
+            handleGameOverTouch(touches)
+        } else {
+            isThrusting = true
+        }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -68,7 +77,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         isThrusting = false
     }
     
+    private func handleGameOverTouch(_ touches: Set<UITouch>) {
+        guard let touch = touches.first, let overlay = gameOverOverlay else { return }
+        let location = touch.location(in: self)
+        
+        guard let buttonName = overlay.buttonName(at: location) else { return }
+        
+        switch buttonName {
+        case NodeNames.retryButton:
+            restartGame()
+        case NodeNames.menuButton:
+            goToMenu()
+        default:
+            break
+        }
+    }
+    
+    
     override func update(_ currentTime: TimeInterval) {
+        guard !isGameOver else { return }
+        
         if lastUpdateTime == 0 {
             lastUpdateTime = currentTime
         }
@@ -78,7 +106,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         elapsedTime += dt
         score = Int(elapsedTime * TimeInterval(GameConfig.scoreMultiplier))
         scoreLabel.text = "\(score) m"
-
+        
         if isThrusting {
             player.physicsBody?.applyForce(CGVector(dx: 0, dy: GameConfig.thrustForce))
             
@@ -86,7 +114,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 player.physicsBody?.velocity.dy = GameConfig.maxVelocity
             }
         }
-        
+
         if player.position.y > size.height - 20 {
             player.position.y = size.height - 20
             player.physicsBody?.velocity.dy = 0
@@ -98,21 +126,71 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    
     func didBegin(_ contact: SKPhysicsContact) {
-        saveHighScoreIfNeeded()
-        
-        let transition = SKTransition.doorway(withDuration: 0.8)
-        let menu = MenuScene(size: self.size)
-        menu.scaleMode = .aspectFill
-        menu.lastScore = score   // passar para o menu
-        self.view?.presentScene(menu, transition: transition)
+        guard !isGameOver else { return }
+        triggerGameOver()
     }
     
-    private func saveHighScoreIfNeeded() {
+    private func triggerGameOver() {
+        isGameOver = true
+        isThrusting = false
+
+        self.removeAction(forKey: "spawnLoop")
+        player.physicsBody?.velocity = .zero
+        player.physicsBody?.affectedByGravity = false
+
+        self.enumerateChildNodes(withName: "obstacle") { node, _ in
+            node.removeAllActions()
+        }
+
         let defaults = UserDefaults.standard
-        let currentHigh = defaults.integer(forKey: StorageKeys.highScore)
-        if score > currentHigh {
+        let previousHigh = defaults.integer(forKey: StorageKeys.highScore)
+        let isNewRecord = score > previousHigh
+        if isNewRecord {
             defaults.set(score, forKey: StorageKeys.highScore)
         }
+        let highScoreToShow = max(previousHigh, score)
+        
+        let overlay = GameOverOverlay(
+            sceneSize: self.size,
+            score: score,
+            highScore: highScoreToShow,
+            isNewRecord: isNewRecord
+        )
+        overlay.alpha = 0
+        addChild(overlay)
+        overlay.run(SKAction.fadeIn(withDuration: 0.4))
+        gameOverOverlay = overlay
+    }
+    
+    
+    private func restartGame() {
+        gameOverOverlay?.removeFromParent()
+        gameOverOverlay = nil
+        self.enumerateChildNodes(withName: "obstacle") { node, _ in
+            node.removeFromParent()
+        }
+        
+        player.position = CGPoint(x: size.width * 0.2, y: size.height / 2)
+        player.physicsBody?.velocity = .zero
+        player.physicsBody?.affectedByGravity = true
+        
+        score = 0
+        elapsedTime = 0
+        lastUpdateTime = 0
+        scoreLabel.text = "0 m"
+        isGameOver = false
+        isThrusting = false
+        
+        startSpawning()
+    }
+    
+    private func goToMenu() {
+        let menu = MenuScene(size: self.size)
+        menu.scaleMode = .aspectFill
+        menu.lastScore = score
+        let transition = SKTransition.doorway(withDuration: 0.8)
+        self.view?.presentScene(menu, transition: transition)
     }
 }
