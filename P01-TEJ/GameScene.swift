@@ -11,6 +11,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let player = PlayerNode()
     let spawner = ObstacleSpawner()
     
+    var isThrusting = false
+    
     override func didMove(to view: SKView) {
         self.backgroundColor = .black
         self.size = view.bounds.size
@@ -39,8 +41,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        player.physicsBody?.velocity = CGVector.zero
-        player.applyThrust()
+        isThrusting = true
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        isThrusting = false
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        isThrusting = false
+    }
+    
+    override func update(_ currentTime: TimeInterval) {
+        if isThrusting {
+            player.physicsBody?.applyForce(CGVector(dx: 0, dy: GameConfig.thrustForce))
+            
+            if let velocityY = player.physicsBody?.velocity.dy, velocityY > GameConfig.maxVelocity {
+                player.physicsBody?.velocity.dy = GameConfig.maxVelocity
+            }
+        }
+        
+        if player.position.y > size.height - 20 {
+            player.position.y = size.height - 20
+            player.physicsBody?.velocity.dy = 0
+        }
+        
+        if player.position.y < 20 {
+            player.position.y = 20
+            player.physicsBody?.velocity.dy = 0
+        }
     }
     
     func didBegin(_ contact: SKPhysicsContact) {

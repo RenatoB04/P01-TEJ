@@ -16,7 +16,7 @@ class MenuScene: SKScene {
         label.position = CGPoint(x: size.width / 2, y: size.height * 0.6)
         addChild(label)
         
-        let startLabel = SKLabelNode(text: "Tocar para Jogar")
+        let startLabel = SKLabelNode(text: "Press to Play")
         startLabel.fontSize = 20
         startLabel.position = CGPoint(x: size.width / 2, y: size.height * 0.4)
         addChild(startLabel)

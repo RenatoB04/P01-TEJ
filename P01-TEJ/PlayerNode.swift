@@ -26,10 +26,6 @@ class PlayerNode: SKSpriteNode {
         self.physicsBody?.contactTestBitMask = PhysicsCategory.obstacle
         self.physicsBody?.collisionBitMask = PhysicsCategory.none
         self.physicsBody?.affectedByGravity = true
-    }
-    
-    func applyThrust() {
-        self.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        self.physicsBody?.applyImpulse(CGVector(dx: 0, dy: GameConfig.thrustForce))
+        self.physicsBody?.allowsRotation = false
     }
 }

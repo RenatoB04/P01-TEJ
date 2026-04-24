@@ -14,7 +14,8 @@ struct PhysicsCategory {
 }
 
 struct GameConfig {
-    static let gravity: CGFloat = -7.0
-    static let thrustForce: CGFloat = 50.0
+    static let gravity: CGFloat = -7.0 
+    static let thrustForce: CGFloat = 140.0
+    static let maxVelocity: CGFloat = 300.0
     static let spawnRate: TimeInterval = 1.5
 }
