@@ -1,15 +1,9 @@
-//
-//  ObstacleSpawner.swift
-//  P01-TEJ
-//
-//  Created by Aluno a27945 Teste on 24/04/2026.
-//
-
 import SpriteKit
 
 class ObstacleSpawner {
-    func spawn(in scene: SKScene) {
-        let obstacle = SKSpriteNode(color: .red, size: CGSize(width: 30, height: 30))
+    func spawn(in scene: SKScene, moveDuration: TimeInterval) {
+        let size = CGSize(width: 30, height: 30)
+        let obstacle = SKSpriteNode(color: .red, size: size)
         obstacle.name = "obstacle"
         
         let randomY = CGFloat.random(in: 50...scene.size.height - 50)
@@ -21,7 +15,7 @@ class ObstacleSpawner {
         
         scene.addChild(obstacle)
         
-        let moveAction = SKAction.moveTo(x: -50, duration: 3.5)
+        let moveAction = SKAction.moveTo(x: -50, duration: moveDuration)
         let removeAction = SKAction.removeFromParent()
         obstacle.run(SKAction.sequence([moveAction, removeAction]))
     }

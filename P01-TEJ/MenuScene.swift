@@ -1,10 +1,3 @@
-//
-//  MenuScene.swift
-//  P01-TEJ
-//
-//  Created by Aluno a27945 Teste on 24/04/2026.
-//
-
 import SpriteKit
 
 class MenuScene: SKScene {

@@ -1,10 +1,3 @@
-//
-//  AppDelegate.swift
-//  P01-TEJ
-//
-//  Created by VM on 11/04/2026.
-//
-
 import UIKit
 
 @main

@@ -1,10 +1,3 @@
-//
-//  Constants.swift
-//  P01-TEJ
-//
-//  Created by Aluno a27945 Teste on 24/04/2026.
-//
-
 import SpriteKit
 
 struct PhysicsCategory {
@@ -44,3 +37,15 @@ struct NodeNames {
         static let midStarSize: CGFloat = 2.0
         static let nearStarSize: CGFloat = 3.0
     }
+
+struct DifficultyConfig {
+    static let rampDuration: TimeInterval = 15.0
+    static let rampIntensity: CGFloat = 0.6
+    static let maxDifficulty: CGFloat = 2.5
+}
+
+struct SpawnConfig {
+    static let baseObstacleDuration: TimeInterval = 3.5
+    static let minSpawnRate: TimeInterval = 0.45
+    static let minObstacleDuration: TimeInterval = 1.4
+}

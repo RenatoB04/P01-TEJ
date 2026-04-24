@@ -1,15 +1,9 @@
-//
-//  GameScene.swift
-//  P01-TEJ
-//
-//  Created by VM on 11/04/2026.
-//
-
 import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     let player = PlayerNode()
     let spawner = ObstacleSpawner()
+    let difficultyManager = DifficultyManager()
     
     var isThrusting = false
     var isGameOver = false
@@ -39,7 +33,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         setupHUD()
-        startSpawning()
+        scheduleNextSpawn()
     }
     
     private func setupStarField(view: SKView) {
@@ -60,15 +54,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    func startSpawning() {
+    private func scheduleNextSpawn() {
         self.removeAction(forKey: "spawnLoop")
-        let wait = SKAction.wait(forDuration: GameConfig.spawnRate)
+        
+        let waitDuration = difficultyManager.currentSpawnRate()
+        let wait = SKAction.wait(forDuration: waitDuration)
         let spawn = SKAction.run { [weak self] in
             guard let self = self, !self.isGameOver else { return }
-            self.spawner.spawn(in: self)
+            let duration = self.difficultyManager.currentObstacleDuration()
+            self.spawner.spawn(in: self, moveDuration: duration)
+            self.scheduleNextSpawn()
         }
+        
         let sequence = SKAction.sequence([wait, spawn])
-        run(SKAction.repeatForever(sequence), withKey: "spawnLoop")
+        run(sequence, withKey: "spawnLoop")
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -112,9 +111,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let dt = currentTime - lastUpdateTime
         lastUpdateTime = currentTime
         
-        starField?.update(deltaTime: dt)
-        
         elapsedTime += dt
+        difficultyManager.update(elapsedTime: elapsedTime)
+        
+        starField?.update(
+            deltaTime: dt,
+            speedMultiplier: difficultyManager.currentParallaxMultiplier()
+        )
+        
         score = Int(elapsedTime * TimeInterval(GameConfig.scoreMultiplier))
         scoreLabel.text = "\(score) m"
         
@@ -192,7 +196,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         isGameOver = false
         isThrusting = false
         
-        startSpawning()
+        difficultyManager.reset()
+        
+        scheduleNextSpawn()
     }
     
     private func goToMenu() {

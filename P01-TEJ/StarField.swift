@@ -1,10 +1,3 @@
-//
-//  StarField.swift
-//  P01-TEJ
-//
-//  Created by Aluno a27945 Teste on 24/04/2026.
-//
-
 import SpriteKit
 
 class StarField: SKNode {
@@ -91,10 +84,10 @@ class StarField: SKNode {
         return texture
     }
     
-    func update(deltaTime: TimeInterval) {
-        scrollLayer(farLayer, speed: StarFieldConfig.farLayerSpeed, deltaTime: deltaTime)
-        scrollLayer(midLayer, speed: StarFieldConfig.midLayerSpeed, deltaTime: deltaTime)
-        scrollLayer(nearLayer, speed: StarFieldConfig.nearLayerSpeed, deltaTime: deltaTime)
+    func update(deltaTime: TimeInterval, speedMultiplier: CGFloat) {
+        scrollLayer(farLayer, speed: StarFieldConfig.farLayerSpeed * speedMultiplier, deltaTime: deltaTime)
+        scrollLayer(midLayer, speed: StarFieldConfig.midLayerSpeed * speedMultiplier, deltaTime: deltaTime)
+        scrollLayer(nearLayer, speed: StarFieldConfig.nearLayerSpeed * speedMultiplier, deltaTime: deltaTime)
     }
     
     private func scrollLayer(_ layer: SKNode, speed: CGFloat, deltaTime: TimeInterval) {
