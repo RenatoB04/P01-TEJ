@@ -18,6 +18,7 @@
 		29C5F9F72F9B63E700CD44B4 /* ObstacleSpawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5F9F62F9B63E700CD44B4 /* ObstacleSpawner.swift */; };
 		29C5F9F92F9B640800CD44B4 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5F9F82F9B640800CD44B4 /* MenuScene.swift */; };
 		29C5F9FB2F9B6FB900CD44B4 /* GameOverOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5F9FA2F9B6FB900CD44B4 /* GameOverOverlay.swift */; };
+		29C5F9FD2F9B710300CD44B4 /* StarField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5F9FC2F9B710300CD44B4 /* StarField.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		29C5F9F62F9B63E700CD44B4 /* ObstacleSpawner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObstacleSpawner.swift; sourceTree = "<group>"; };
 		29C5F9F82F9B640800CD44B4 /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		29C5F9FA2F9B6FB900CD44B4 /* GameOverOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOverOverlay.swift; sourceTree = "<group>"; };
+		29C5F9FC2F9B710300CD44B4 /* StarField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarField.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +51,7 @@
 		29C5F9CF2F9B632900CD44B4 = {
 			isa = PBXGroup;
 			children = (
+				29C5F9FC2F9B710300CD44B4 /* StarField.swift */,
 				29C5F9DA2F9B632900CD44B4 /* P01-TEJ */,
 				29C5F9D92F9B632900CD44B4 /* Products */,
 			);
@@ -152,6 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				29C5F9FB2F9B6FB900CD44B4 /* GameOverOverlay.swift in Sources */,
+				29C5F9FD2F9B710300CD44B4 /* StarField.swift in Sources */,
 				29C5F9E22F9B632900CD44B4 /* GameScene.swift in Sources */,
 				29C5F9E42F9B632900CD44B4 /* GameViewController.swift in Sources */,
 				29C5F9DC2F9B632900CD44B4 /* AppDelegate.swift in Sources */,

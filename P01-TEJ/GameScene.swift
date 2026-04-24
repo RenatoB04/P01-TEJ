@@ -13,11 +13,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var isThrusting = false
     var isGameOver = false
-
+    
     private var score: Int = 0
     private var lastUpdateTime: TimeInterval = 0
     private var elapsedTime: TimeInterval = 0
     private let scoreLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
+    
+    private var starField: StarField?
     
     private weak var gameOverOverlay: GameOverOverlay?
     
@@ -28,6 +30,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.physicsWorld.gravity = CGVector(dx: 0, dy: GameConfig.gravity)
         self.physicsWorld.contactDelegate = self
         
+        setupStarField(view: view)
+        
         player.position = CGPoint(x: size.width * 0.2, y: size.height / 2)
         
         if player.parent == nil {
@@ -36,6 +40,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         setupHUD()
         startSpawning()
+    }
+    
+    private func setupStarField(view: SKView) {
+        let field = StarField(sceneSize: self.size, view: view)
+        addChild(field)
+        self.starField = field
     }
     
     private func setupHUD() {
@@ -93,7 +103,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    
     override func update(_ currentTime: TimeInterval) {
         guard !isGameOver else { return }
         
@@ -102,6 +111,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         let dt = currentTime - lastUpdateTime
         lastUpdateTime = currentTime
+        
+        starField?.update(deltaTime: dt)
         
         elapsedTime += dt
         score = Int(elapsedTime * TimeInterval(GameConfig.scoreMultiplier))
@@ -114,7 +125,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 player.physicsBody?.velocity.dy = GameConfig.maxVelocity
             }
         }
-
+        
         if player.position.y > size.height - 20 {
             player.position.y = size.height - 20
             player.physicsBody?.velocity.dy = 0
@@ -126,7 +137,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    
     func didBegin(_ contact: SKPhysicsContact) {
         guard !isGameOver else { return }
         triggerGameOver()
@@ -135,15 +145,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     private func triggerGameOver() {
         isGameOver = true
         isThrusting = false
-
+        
         self.removeAction(forKey: "spawnLoop")
         player.physicsBody?.velocity = .zero
         player.physicsBody?.affectedByGravity = false
-
+        
         self.enumerateChildNodes(withName: "obstacle") { node, _ in
             node.removeAllActions()
         }
-
+        
         let defaults = UserDefaults.standard
         let previousHigh = defaults.integer(forKey: StorageKeys.highScore)
         let isNewRecord = score > previousHigh
@@ -163,7 +173,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         overlay.run(SKAction.fadeIn(withDuration: 0.4))
         gameOverOverlay = overlay
     }
-    
     
     private func restartGame() {
         gameOverOverlay?.removeFromParent()
